@@ -10,5 +10,11 @@ Modern, responsive UI
 Setup:
 npm install
 Get Gemini API key
-Configure .env.local
+
+
+
+Configure env
+create file '.env.local'
+NEXT_PUBLIC_GEMINI_API_KEY=your-gemini-api-key
+
 npm run dev

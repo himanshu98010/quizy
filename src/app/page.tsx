@@ -31,7 +31,7 @@ import "@mantine/notifications/styles.css";
 
 import { createWorker } from "tesseract.js";
 import jsPDF from "jspdf";
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import Link from "next/link";
 
 interface ProgressMessage {
   progress: number;
@@ -79,220 +79,19 @@ const Home = () => {
 
   const workerRef = useRef<any>(null);
 
-  // Initialize Gemini AI
-  const genAI = new GoogleGenerativeAI(
-    process.env.NEXT_PUBLIC_GEMINI_API_KEY || ""
-  );
+  // Landing delegates quiz generation to /quiz via sessionStorage
 
-  // Generate quiz from extracted text
   const generateQuiz = async (text: string) => {
     if (!text.trim()) return;
-
-    setIsGeneratingQuiz(true);
-    setProgressLabel("Generating quiz questions...");
-    setProgress(0);
-
     try {
-      const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-
-      const prompt = `Based on the following text content, generate exactly 5 multiple choice questions (MCQs) that test understanding of the key concepts.
-
-Text content:
-${text}
-
-IMPORTANT: Respond with ONLY valid JSON in this exact format (no additional text, explanations, or markdown):
-{
-  "questions": [
-    {
-      "id": 1,
-      "question": "What is the main topic discussed in the text?",
-      "options": ["Option A", "Option B", "Option C", "Option D"],
-      "correctAnswer": 0,
-      "explanation": "This is correct because..."
-    },
-    {
-      "id": 2,
-      "question": "Which statement best describes the concept?",
-      "options": ["Option A", "Option B", "Option C", "Option D"],
-      "correctAnswer": 1,
-      "explanation": "This is correct because..."
-    },
-    {
-      "id": 3,
-      "question": "What is the primary purpose mentioned?",
-      "options": ["Option A", "Option B", "Option C", "Option D"],
-      "correctAnswer": 2,
-      "explanation": "This is correct because..."
-    },
-    {
-      "id": 4,
-      "question": "Which of the following is true according to the text?",
-      "options": ["Option A", "Option B", "Option C", "Option D"],
-      "correctAnswer": 3,
-      "explanation": "This is correct because..."
-    },
-    {
-      "id": 5,
-      "question": "What can be inferred from the information provided?",
-      "options": ["Option A", "Option B", "Option C", "Option D"],
-      "correctAnswer": 0,
-      "explanation": "This is correct because..."
-    }
-  ]
-}
-
-Requirements:
-- Generate exactly 5 questions based on the text content
-- Make questions clear and test understanding
-- Ensure options are plausible and varied
-- Correct answers should be distributed (0, 1, 2, 3)
-- Provide helpful explanations
-- Return ONLY the JSON object, no other text`;
-
-      const result = await model.generateContent(prompt);
-      const response = await result.response;
-      const responseText = response.text().trim();
-
-      // Clean up the response to ensure it's valid JSON
-      let cleanResponse = responseText;
-
-      // Remove any markdown formatting
-      cleanResponse = cleanResponse
-        .replace(/```json\n?/g, "")
-        .replace(/```\n?/g, "");
-
-      // Remove any text before the first {
-      const jsonStart = cleanResponse.indexOf("{");
-      if (jsonStart > 0) {
-        cleanResponse = cleanResponse.substring(jsonStart);
-      }
-
-      // Remove any text after the last }
-      const jsonEnd = cleanResponse.lastIndexOf("}");
-      if (jsonEnd > 0 && jsonEnd < cleanResponse.length - 1) {
-        cleanResponse = cleanResponse.substring(0, jsonEnd + 1);
-      }
-
-      console.log("Cleaned response:", cleanResponse);
-
-      let quizData;
-      try {
-        quizData = JSON.parse(cleanResponse);
-      } catch (parseError) {
-        console.error("JSON Parse Error:", parseError);
-        console.error("Raw response:", responseText);
-        console.error("Cleaned response:", cleanResponse);
-
-        // Fallback: try to extract JSON from the response more aggressively
-        const jsonMatch = cleanResponse.match(/\{[\s\S]*\}/);
-        if (jsonMatch) {
-          try {
-            quizData = JSON.parse(jsonMatch[0]);
-          } catch (secondError) {
-            throw new Error(
-              `Failed to parse JSON: ${
-                secondError instanceof Error
-                  ? secondError.message
-                  : "Unknown error"
-              }`
-            );
-          }
-        } else {
-          throw new Error("No valid JSON found in response");
-        }
-      }
-
-      setQuiz({
-        questions: quizData.questions,
-        totalQuestions: quizData.questions.length,
-        timeLimit: 300, // 5 minutes
-      });
-
-      setCurrentView("quiz");
-      setProgress(1);
-      setProgressLabel("Quiz generated successfully!");
-
+      sessionStorage.setItem("iqpg:extracted-text", text);
+      window.location.href = "/quiz";
+    } catch (e) {
       notifications.show({
-        title: "Quiz Ready!",
-        message: `Generated ${quizData.questions.length} questions from your content`,
-        color: "green",
+        title: "Navigation Error",
+        message: "Could not open quiz page.",
+        color: "red",
       });
-    } catch (error) {
-      console.error("Error generating quiz:", error);
-      setProgressLabel("Failed to generate quiz");
-
-      // Fallback: Generate a simple quiz manually
-      const fallbackQuiz = {
-        questions: [
-          {
-            id: 1,
-            question: "What is the main topic of the extracted text?",
-            options: [
-              "General information",
-              "Technical details",
-              "Historical facts",
-              "Personal opinions",
-            ],
-            correctAnswer: 0,
-            explanation:
-              "The text appears to contain general information based on the content.",
-          },
-          {
-            id: 2,
-            question: "How would you categorize this content?",
-            options: ["Educational", "Entertainment", "News", "Fiction"],
-            correctAnswer: 0,
-            explanation: "The content seems educational in nature.",
-          },
-          {
-            id: 3,
-            question: "What type of information is most prominent?",
-            options: [
-              "Facts and data",
-              "Opinions and views",
-              "Instructions",
-              "Stories",
-            ],
-            correctAnswer: 0,
-            explanation: "The text contains factual information and data.",
-          },
-          {
-            id: 4,
-            question: "Which best describes the text's purpose?",
-            options: ["To inform", "To persuade", "To entertain", "To sell"],
-            correctAnswer: 0,
-            explanation: "The primary purpose appears to be informative.",
-          },
-          {
-            id: 5,
-            question: "What level of detail is provided?",
-            options: [
-              "High detail",
-              "Medium detail",
-              "Low detail",
-              "Mixed detail",
-            ],
-            correctAnswer: 1,
-            explanation: "The text provides a moderate level of detail.",
-          },
-        ],
-        totalQuestions: 5,
-        timeLimit: 300,
-      };
-
-      setQuiz(fallbackQuiz);
-      setCurrentView("quiz");
-      setProgress(1);
-      setProgressLabel("Fallback quiz generated");
-
-      notifications.show({
-        title: "Fallback Quiz Generated",
-        message:
-          "Using a basic quiz template due to API issues. Please try again later for AI-generated questions.",
-        color: "yellow",
-      });
-    } finally {
-      setIsGeneratingQuiz(false);
     }
   };
 
@@ -670,38 +469,58 @@ Requirements:
 
   return (
     <MantineProvider>
-      <div className="min-h-screen bg-white">
+      <div className="min-h-screen bg-neutral-950">
         <Container size="xl" className="py-12">
           {/* Header */}
           <div className="text-center mb-12">
-            <h1 className="text-5xl font-bold text-gray-900 mb-4 tracking-tight">
-              Quizy
+            <h1 className="text-6xl font-extrabold text-white mb-6 tracking-tight">
+              Instant Question Paper Generator
             </h1>
-            <p className="text-gray-500 text-xl max-w-2xl mx-auto">
-              Upload any content image and instantly generate MCQ quizzes
+            <p className="text-neutral-400 text-xl max-w-3xl mx-auto">
+              Extract content from images with OCR and generate polished
+              multiple-choice question papers using AI.
             </p>
             <div className="flex justify-center gap-4 mt-6">
               <Badge
                 size="lg"
                 variant="light"
-                className="bg-blue-50 text-blue-700"
+                className="bg-blue-900/30 text-blue-400"
               >
                 📸 OCR Text Extraction
               </Badge>
               <Badge
                 size="lg"
                 variant="light"
-                className="bg-green-50 text-green-700"
+                className="bg-green-900/30 text-green-400"
               >
                 🤖 AI Quiz Generation
               </Badge>
               <Badge
                 size="lg"
                 variant="light"
-                className="bg-purple-50 text-purple-700"
+                className="bg-purple-900/30 text-purple-400"
               >
                 ⚡ Instant Evaluation
               </Badge>
+            </div>
+            <div className="flex justify-center gap-4 mt-8">
+              <Button
+                component={Link as any}
+                href="/quiz"
+                size="lg"
+                className="bg-blue-600 hover:bg-blue-700"
+              >
+                Open Quiz
+              </Button>
+              <Button
+                component={Link as any}
+                href="/README"
+                variant="light"
+                color="gray"
+                size="lg"
+              >
+                Read Docs
+              </Button>
             </div>
           </div>
 
@@ -712,14 +531,14 @@ Requirements:
                 shadow="none"
                 padding={0}
                 radius="xl"
-                className="relative border-2 border-gray-100 hover:border-gray-200 transition-all duration-300"
+                className="relative border border-neutral-800 bg-neutral-900 transition-all duration-300"
               >
                 <Card.Section>
                   <Dropzone
                     onDrop={(files) => loadFile(files[0])}
                     accept={IMAGE_MIME_TYPE}
                     multiple={false}
-                    className="border-0 bg-gray-50 hover:bg-gray-100 transition-all duration-300"
+                    className="border-0 bg-neutral-900"
                     styles={{
                       root: {
                         minHeight: "280px",
@@ -736,7 +555,7 @@ Requirements:
                       <Dropzone.Accept>
                         <IconPhoto
                           size={64}
-                          className="text-gray-600"
+                          className="text-neutral-200"
                           stroke={1.5}
                         />
                       </Dropzone.Accept>
@@ -750,7 +569,7 @@ Requirements:
                       <Dropzone.Idle>
                         <IconPhoto
                           size={64}
-                          className="text-gray-400"
+                          className="text-neutral-500"
                           stroke={1.5}
                         />
                       </Dropzone.Idle>
@@ -758,11 +577,11 @@ Requirements:
                       <div className="text-center">
                         <Text
                           size="xl"
-                          className="text-gray-700 font-semibold mb-2"
+                          className="text-neutral-200 font-semibold mb-2"
                         >
                           Drop your image here
                         </Text>
-                        <Text size="sm" className="text-gray-500">
+                        <Text size="sm" className="text-neutral-500">
                           or click to browse • JPG, PNG, GIF, WebP • Max 10MB
                         </Text>
                       </div>
@@ -777,7 +596,7 @@ Requirements:
                   shadow="none"
                   padding="lg"
                   radius="xl"
-                  className="relative border-2 border-gray-100"
+                  className="relative border border-neutral-800 bg-neutral-900"
                 >
                   <Card.Section>
                     <div className="relative">
@@ -791,7 +610,7 @@ Requirements:
                         variant="filled"
                         color="red"
                         size="lg"
-                        className="absolute top-3 right-3 shadow-lg"
+                        className="absolute top-3 right-3"
                         onClick={clearImage}
                       >
                         <IconX size={18} />
@@ -805,7 +624,7 @@ Requirements:
                         variant="light"
                         color="gray"
                         size="lg"
-                        className="bg-gray-100 text-gray-700"
+                        className="bg-neutral-800 text-neutral-200"
                       >
                         {imageFile.name} (
                         {(imageFile.size / 1024 / 1024).toFixed(2)} MB)
@@ -823,21 +642,14 @@ Requirements:
                 shadow="none"
                 padding="lg"
                 radius="xl"
-                className="border-2 border-gray-100"
+                className="border border-neutral-800 bg-neutral-900"
               >
                 <Stack gap="lg">
                   <Button
                     onClick={handleExtract}
                     disabled={!imageData || !workerReady || isProcessing}
                     size="xl"
-                    className={`
-                    transition-all duration-300 transform bg-gray-900 hover:bg-gray-800 text-white font-semibold
-                    ${
-                      !imageData || !workerReady || isProcessing
-                        ? "opacity-50"
-                        : "hover:scale-105 shadow-xl"
-                    }
-                  `}
+                    className="bg-white text-black hover:bg-neutral-200"
                     loading={isProcessing}
                     leftSection={<IconPhoto size={24} />}
                   >
@@ -847,35 +659,24 @@ Requirements:
                   {ocrResult && !isAnimating && (
                     <Button
                       onClick={() => generateQuiz(ocrResult)}
-                      disabled={isGeneratingQuiz}
                       size="xl"
-                      className={`
-                      transition-all duration-300 transform bg-blue-600 hover:bg-blue-700 text-white font-semibold
-                      ${
-                        isGeneratingQuiz
-                          ? "opacity-50"
-                          : "hover:scale-105 shadow-xl"
-                      }
-                    `}
-                      loading={isGeneratingQuiz}
+                      className="bg-blue-600 hover:bg-blue-700"
                       leftSection={<IconFileText size={24} />}
                     >
-                      {isGeneratingQuiz
-                        ? "Generating Quiz..."
-                        : "Generate Quiz"}
+                      Open Quiz
                     </Button>
                   )}
 
                   {/* Status */}
                   <div className="flex items-center justify-between">
-                    <Text size="sm" className="font-medium text-gray-600">
+                    <Text size="sm" className="font-medium text-neutral-400">
                       {progressLabel}
                     </Text>
                     {workerReady && (
                       <Badge
                         color="green"
                         variant="light"
-                        className="bg-green-50 text-green-700"
+                        className="bg-green-900/30 text-green-400"
                       >
                         Ready
                       </Badge>
@@ -896,7 +697,7 @@ Requirements:
                       />
                       <Text
                         size="xs"
-                        className="text-right text-gray-500 font-medium"
+                        className="text-right text-neutral-500 font-medium"
                       >
                         {Math.round(progress * 100)}% complete
                       </Text>
@@ -911,16 +712,14 @@ Requirements:
                   shadow="none"
                   padding="lg"
                   radius="xl"
-                  className="flex-1 border-2 border-gray-100"
+                  className="flex-1 border border-neutral-800 bg-neutral-900"
                 >
                   <Stack gap="lg">
                     <Group justify="between" align="center">
-                      <Text size="xl" className="font-bold text-gray-900">
+                      <Text size="xl" className="font-bold text-white">
                         Extracted Text
                         {isAnimating && (
-                          <span className="ml-2 text-gray-500 pulse-slow">
-                            ⚡
-                          </span>
+                          <span className="ml-2 text-neutral-400">⚡</span>
                         )}
                       </Text>
                       <Group gap="xs">
@@ -930,7 +729,7 @@ Requirements:
                           onClick={handleCopyText}
                           size="lg"
                           title="Copy to clipboard"
-                          className="hover:bg-gray-100"
+                          className="hover:bg-neutral-800"
                         >
                           <IconCopy size={18} />
                         </ActionIcon>
@@ -940,7 +739,7 @@ Requirements:
                           onClick={handleDownloadText}
                           size="lg"
                           title="Download as text file"
-                          className="hover:bg-gray-100"
+                          className="hover:bg-neutral-800"
                         >
                           <IconFileText size={18} />
                         </ActionIcon>
@@ -950,7 +749,7 @@ Requirements:
                           onClick={handleDownloadPDF}
                           size="lg"
                           title="Download as PDF"
-                          className="hover:bg-gray-100"
+                          className="hover:bg-neutral-800"
                         >
                           <IconFile size={18} />
                         </ActionIcon>
@@ -960,22 +759,22 @@ Requirements:
                           onClick={handleDownloadMarkdown}
                           size="lg"
                           title="Download as Markdown"
-                          className="hover:bg-gray-100"
+                          className="hover:bg-neutral-800"
                         >
                           <IconMarkdown size={18} />
                         </ActionIcon>
                       </Group>
                     </Group>
 
-                    <Card className="bg-gray-900 border-0 max-h-96 overflow-hidden rounded-xl">
+                    <Card className="bg-black border-0 max-h-96 overflow-hidden rounded-xl">
                       <div className="max-h-80 overflow-y-auto p-4">
                         <Text
-                          className="text-gray-100 font-mono text-sm whitespace-pre-wrap break-words leading-relaxed"
+                          className="text-neutral-100 font-mono text-sm whitespace-pre-wrap break-words leading-relaxed"
                           style={{ fontFamily: "Monaco, Consolas, monospace" }}
                         >
                           {displayedText}
                           {isAnimating && (
-                            <span className="typewriter-cursor text-gray-400">
+                            <span className="typewriter-cursor text-neutral-500">
                               |
                             </span>
                           )}
@@ -983,11 +782,11 @@ Requirements:
                       </div>
                     </Card>
 
-                    <Text size="xs" className="text-gray-500 font-medium">
+                    <Text size="xs" className="text-neutral-500 font-medium">
                       {displayedText.length} characters •{" "}
                       {displayedText.split("\n").length} lines
                       {isAnimating && (
-                        <span className="ml-2 text-gray-400">
+                        <span className="ml-2 text-neutral-400">
                           (Typing...{" "}
                           {Math.round(
                             (displayedText.length / ocrResult.length) * 100
@@ -1000,113 +799,7 @@ Requirements:
                 </Card>
               )}
 
-              {/* Quiz Interface */}
-              {currentView === "quiz" && quiz && (
-                <Card
-                  shadow="none"
-                  padding="lg"
-                  radius="xl"
-                  className="flex-1 border-2 border-gray-100"
-                >
-                  <Stack gap="lg">
-                    {/* Quiz Header */}
-                    <div className="flex justify-between items-center">
-                      <Text size="xl" className="font-bold text-gray-900">
-                        Question {currentQuestionIndex + 1} of{" "}
-                        {quiz.totalQuestions}
-                      </Text>
-                      <Badge
-                        size="lg"
-                        variant="light"
-                        className="bg-blue-50 text-blue-700"
-                      >
-                        {Math.round(
-                          ((currentQuestionIndex + 1) / quiz.totalQuestions) *
-                            100
-                        )}
-                        % Complete
-                      </Badge>
-                    </div>
-
-                    {/* Progress Bar */}
-                    <Progress
-                      value={
-                        ((currentQuestionIndex + 1) / quiz.totalQuestions) * 100
-                      }
-                      size="lg"
-                      radius="xl"
-                      color="blue"
-                      className="transition-all duration-300"
-                    />
-
-                    {/* Question */}
-                    <Card className="bg-gray-50 border-0 p-6 rounded-xl">
-                      <Text
-                        size="lg"
-                        className="font-semibold text-gray-800 mb-6"
-                      >
-                        {quiz.questions[currentQuestionIndex].question}
-                      </Text>
-
-                      {/* Options */}
-                      <Stack gap="md">
-                        {quiz.questions[currentQuestionIndex].options.map(
-                          (option, index) => (
-                            <Button
-                              key={index}
-                              variant={
-                                userAnswers[currentQuestionIndex] === index
-                                  ? "filled"
-                                  : "light"
-                              }
-                              color={
-                                userAnswers[currentQuestionIndex] === index
-                                  ? "blue"
-                                  : "gray"
-                              }
-                              size="lg"
-                              className="justify-start text-left h-auto p-4"
-                              onClick={() => handleAnswerSelect(index)}
-                            >
-                              <div className="flex items-start gap-3">
-                                <span className="font-semibold text-sm">
-                                  {String.fromCharCode(65 + index)}.
-                                </span>
-                                <span className="text-left">{option}</span>
-                              </div>
-                            </Button>
-                          )
-                        )}
-                      </Stack>
-                    </Card>
-
-                    {/* Navigation */}
-                    <div className="flex justify-between">
-                      <Button
-                        onClick={handlePreviousQuestion}
-                        disabled={currentQuestionIndex === 0}
-                        variant="light"
-                        color="gray"
-                        size="lg"
-                      >
-                        Previous
-                      </Button>
-                      <Button
-                        onClick={handleNextQuestion}
-                        disabled={
-                          userAnswers[currentQuestionIndex] === undefined
-                        }
-                        size="lg"
-                        className="bg-blue-600 hover:bg-blue-700"
-                      >
-                        {currentQuestionIndex === quiz.totalQuestions - 1
-                          ? "Finish Quiz"
-                          : "Next"}
-                      </Button>
-                    </div>
-                  </Stack>
-                </Card>
-              )}
+              {/* Quiz UI moved to /quiz */}
 
               {/* Results Interface */}
               {currentView === "results" && quiz && (
@@ -1114,20 +807,20 @@ Requirements:
                   shadow="none"
                   padding="lg"
                   radius="xl"
-                  className="flex-1 border-2 border-gray-100"
+                  className="flex-1 border border-neutral-800 bg-neutral-900"
                 >
                   <Stack gap="lg">
                     <div className="text-center">
-                      <Text size="2xl" className="font-bold text-gray-900 mb-2">
+                      <Text size="2xl" className="font-bold text-white mb-2">
                         Quiz Complete!
                       </Text>
-                      <Text size="xl" className="text-gray-600 mb-6">
+                      <Text size="xl" className="text-neutral-300 mb-6">
                         Your Score: {score}%
                       </Text>
 
                       {/* Score Circle */}
                       <div className="relative w-32 h-32 mx-auto mb-6">
-                        <div className="absolute inset-0 rounded-full border-8 border-gray-200"></div>
+                        <div className="absolute inset-0 rounded-full border-8 border-neutral-700"></div>
                         <div
                           className="absolute inset-0 rounded-full border-8 border-blue-600"
                           style={{
@@ -1143,7 +836,7 @@ Requirements:
                           }}
                         ></div>
                         <div className="absolute inset-0 flex items-center justify-center">
-                          <Text size="2xl" className="font-bold text-gray-900">
+                          <Text size="2xl" className="font-bold text-white">
                             {score}%
                           </Text>
                         </div>
@@ -1154,9 +847,9 @@ Requirements:
                         {quiz.questions.map((question, index) => (
                           <Card
                             key={index}
-                            className="p-4 border border-gray-200 rounded-lg"
+                            className="p-4 border border-neutral-800 rounded-lg bg-neutral-800/60"
                           >
-                            <Text className="font-semibold text-gray-800 mb-2">
+                            <Text className="font-semibold text-neutral-100 mb-2">
                               Question {index + 1}: {question.question}
                             </Text>
                             <div className="space-y-2">
@@ -1165,23 +858,23 @@ Requirements:
                                   key={optionIndex}
                                   className={`p-2 rounded ${
                                     optionIndex === question.correctAnswer
-                                      ? "bg-green-100 text-green-800"
+                                      ? "bg-green-900/30 text-green-300"
                                       : userAnswers[index] === optionIndex &&
                                         optionIndex !== question.correctAnswer
-                                      ? "bg-red-100 text-red-800"
-                                      : "bg-gray-50 text-gray-700"
+                                      ? "bg-red-900/30 text-red-300"
+                                      : "bg-neutral-900 text-neutral-300"
                                   }`}
                                 >
                                   {String.fromCharCode(65 + optionIndex)}.{" "}
                                   {option}
                                   {optionIndex === question.correctAnswer && (
-                                    <span className="ml-2 text-green-600 font-semibold">
+                                    <span className="ml-2 text-green-400 font-semibold">
                                       ✓ Correct
                                     </span>
                                   )}
                                   {userAnswers[index] === optionIndex &&
                                     optionIndex !== question.correctAnswer && (
-                                      <span className="ml-2 text-red-600 font-semibold">
+                                      <span className="ml-2 text-red-400 font-semibold">
                                         ✗ Your Answer
                                       </span>
                                     )}
@@ -1191,7 +884,7 @@ Requirements:
                             {question.explanation && (
                               <Text
                                 size="sm"
-                                className="text-gray-600 mt-2 italic"
+                                className="text-neutral-300 mt-2 italic"
                               >
                                 Explanation: {question.explanation}
                               </Text>
@@ -1205,7 +898,7 @@ Requirements:
                         <Button
                           onClick={resetQuiz}
                           size="lg"
-                          className="bg-gray-600 hover:bg-gray-700"
+                          className="bg-neutral-700 hover:bg-neutral-600"
                         >
                           Take Another Quiz
                         </Button>

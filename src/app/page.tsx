@@ -12,7 +12,6 @@ import {
   Card,
   Badge,
   ActionIcon,
-  MantineProvider,
 } from "@mantine/core";
 import { Dropzone, IMAGE_MIME_TYPE } from "@mantine/dropzone";
 import { notifications } from "@mantine/notifications";
@@ -468,80 +467,101 @@ const Home = () => {
   };
 
   return (
-    <MantineProvider>
-      <div className="min-h-screen bg-neutral-950">
-        <Container size="xl" className="py-12">
+      <div className="min-h-screen bg-gradient-to-br from-slate-950 via-purple-950 to-slate-950 relative overflow-hidden">
+        {/* Background decoration */}
+        <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 via-purple-500/5 to-pink-500/5" />
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl animate-pulse" />
+        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl animate-pulse" style={{animationDelay: '1s'}} />
+        
+        <Container size="xl" className="py-16 relative z-10">
           {/* Header */}
-          <div className="text-center mb-12">
-            <h1 className="text-6xl font-extrabold text-white mb-6 tracking-tight">
-              Instant Question Paper Generator
-            </h1>
-            <p className="text-neutral-400 text-xl max-w-3xl mx-auto">
-              Extract content from images with OCR and generate polished
-              multiple-choice question papers using AI.
+          <div className="text-center mb-16">
+            <div className="inline-block mb-8">
+              <div className="bg-gradient-to-r from-blue-600 to-purple-600 p-1 rounded-2xl shadow-2xl hover-lift">
+                <div className="bg-slate-950 px-8 py-4 rounded-xl">
+                  <h1 className="text-7xl font-black bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent mb-2 tracking-tight">
+                    Quizy
+                  </h1>
+                  <p className="text-slate-400 text-sm font-medium tracking-wider uppercase">
+                    Instant Question Paper Generator
+                  </p>
+                </div>
+              </div>
+            </div>
+            
+            <p className="text-slate-300 text-2xl max-w-4xl mx-auto leading-relaxed mb-12 font-light">
+              Transform any image into an interactive quiz with our advanced OCR technology and AI-powered question generation
             </p>
-            <div className="flex justify-center gap-4 mt-6">
+            
+            <div className="flex flex-wrap justify-center gap-6 mb-12">
               <Badge
-                size="lg"
+                size="xl"
                 variant="light"
-                className="bg-blue-900/30 text-blue-400"
+                className="bg-gradient-to-r from-blue-900/40 to-blue-800/40 text-blue-300 border border-blue-500/20 px-6 py-3 hover-lift"
               >
-                📸 OCR Text Extraction
+                <span className="text-2xl mr-3">📸</span>
+                OCR Text Extraction
               </Badge>
               <Badge
-                size="lg"
+                size="xl"
                 variant="light"
-                className="bg-green-900/30 text-green-400"
+                className="bg-gradient-to-r from-emerald-900/40 to-green-800/40 text-emerald-300 border border-emerald-500/20 px-6 py-3 hover-lift"
               >
-                🤖 AI Quiz Generation
+                <span className="text-2xl mr-3">🤖</span>
+                AI Quiz Generation
               </Badge>
               <Badge
-                size="lg"
+                size="xl"
                 variant="light"
-                className="bg-purple-900/30 text-purple-400"
+                className="bg-gradient-to-r from-purple-900/40 to-pink-800/40 text-purple-300 border border-purple-500/20 px-6 py-3 hover-lift"
               >
-                ⚡ Instant Evaluation
+                <span className="text-2xl mr-3">⚡</span>
+                Instant Evaluation
               </Badge>
             </div>
-            <div className="flex justify-center gap-4 mt-8">
+            
+            <div className="flex justify-center gap-6">
               <Button
                 component={Link as any}
                 href="/quiz"
-                size="lg"
-                className="bg-blue-600 hover:bg-blue-700"
+                size="xl"
+                className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 shadow-2xl hover-lift px-8 py-4 text-lg font-semibold"
               >
-                Open Quiz
+                Start Creating Quizzes
               </Button>
               <Button
                 component={Link as any}
-                href="/README"
+                href="/studio"
                 variant="light"
-                color="gray"
-                size="lg"
+                size="xl"
+                className="bg-slate-800/50 hover:bg-slate-700/60 border border-slate-600/50 text-slate-200 hover-lift px-8 py-4 text-lg font-semibold"
               >
-                Read Docs
+                Open Studio
               </Button>
             </div>
           </div>
 
-          <Group align="flex-start" gap="xl" className="min-h-[600px]">
+          <Group align="flex-start" gap="xl" className="min-h-[700px]">
             {/* Left Column - Image Upload */}
             <Stack className="flex-1 max-w-2xl">
               <Card
                 shadow="none"
                 padding={0}
                 radius="xl"
-                className="relative border border-neutral-800 bg-neutral-900 transition-all duration-300"
+                className="relative border border-slate-700/50 bg-gradient-to-br from-slate-900/80 to-slate-800/60 backdrop-blur-xl hover-lift transition-all duration-500 overflow-hidden"
               >
-                <Card.Section>
+                {/* Card glow effect */}
+                <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 via-purple-500/10 to-pink-500/10 opacity-0 hover:opacity-100 transition-opacity duration-500" />
+                
+                <Card.Section className="relative z-10">
                   <Dropzone
                     onDrop={(files) => loadFile(files[0])}
                     accept={IMAGE_MIME_TYPE}
                     multiple={false}
-                    className="border-0 bg-neutral-900"
+                    className="border-0 bg-transparent"
                     styles={{
                       root: {
-                        minHeight: "280px",
+                        minHeight: "320px",
                         borderRadius: "12px",
                       },
                       inner: { pointerEvents: "all" },
@@ -550,41 +570,58 @@ const Home = () => {
                     <Group
                       justify="center"
                       gap="xl"
-                      className="min-h-[180px] pointer-events-none"
+                      className="min-h-[280px] pointer-events-none"
                     >
                       <Dropzone.Accept>
-                        <IconPhoto
-                          size={64}
-                          className="text-neutral-200"
-                          stroke={1.5}
-                        />
+                        <div className="text-center animate-bounce">
+                          <IconPhoto
+                            size={80}
+                            className="text-blue-400 mx-auto mb-4"
+                            stroke={1.5}
+                          />
+                          <Text className="text-blue-300 font-semibold">
+                            Perfect! Drop it here
+                          </Text>
+                        </div>
                       </Dropzone.Accept>
+                      
                       <Dropzone.Reject>
-                        <IconX
-                          size={64}
-                          className="text-red-500"
-                          stroke={1.5}
-                        />
+                        <div className="text-center animate-pulse">
+                          <IconX
+                            size={80}
+                            className="text-red-400 mx-auto mb-4"
+                            stroke={1.5}
+                          />
+                          <Text className="text-red-300 font-semibold">
+                            Invalid file type
+                          </Text>
+                        </div>
                       </Dropzone.Reject>
+                      
                       <Dropzone.Idle>
-                        <IconPhoto
-                          size={64}
-                          className="text-neutral-500"
-                          stroke={1.5}
-                        />
+                        <div className="text-center">
+                          <div className="relative mb-6">
+                            <IconPhoto
+                              size={80}
+                              className="text-slate-400 mx-auto transition-all duration-300 hover:text-blue-400 hover:scale-110"
+                              stroke={1.5}
+                            />
+                            <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-full blur-xl scale-150 opacity-0 hover:opacity-100 transition-opacity duration-300" />
+                          </div>
+                          <Text
+                            size="xl"
+                            className="text-slate-200 font-bold mb-3 bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent"
+                          >
+                            Drop your image here
+                          </Text>
+                          <Text size="md" className="text-slate-400 font-medium">
+                            or click to browse
+                          </Text>
+                          <Text size="sm" className="text-slate-500 mt-2">
+                            Supports JPG, PNG, GIF, WebP • Max 10MB
+                          </Text>
+                        </div>
                       </Dropzone.Idle>
-
-                      <div className="text-center">
-                        <Text
-                          size="xl"
-                          className="text-neutral-200 font-semibold mb-2"
-                        >
-                          Drop your image here
-                        </Text>
-                        <Text size="sm" className="text-neutral-500">
-                          or click to browse • JPG, PNG, GIF, WebP • Max 10MB
-                        </Text>
-                      </div>
                     </Group>
                   </Dropzone>
                 </Card.Section>
@@ -596,38 +633,41 @@ const Home = () => {
                   shadow="none"
                   padding="lg"
                   radius="xl"
-                  className="relative border border-neutral-800 bg-neutral-900"
+                  className="relative border border-slate-700/50 bg-gradient-to-br from-slate-900/80 to-slate-800/60 backdrop-blur-xl hover-lift transition-all duration-500 overflow-hidden"
                 >
-                  <Card.Section>
-                    <div className="relative">
+                  <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/5 via-blue-500/5 to-purple-500/5" />
+                  
+                  <Card.Section className="relative z-10">
+                    <div className="relative group">
                       <Image
                         src={imageData}
                         alt="Uploaded image"
-                        className="max-h-96 w-full object-contain rounded-lg"
+                        className="max-h-96 w-full object-contain rounded-lg transition-all duration-300 group-hover:scale-[1.02]"
                         fit="contain"
                       />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-lg" />
                       <ActionIcon
                         variant="filled"
-                        color="red"
-                        size="lg"
-                        className="absolute top-3 right-3"
+                        size="xl"
+                        className="absolute top-3 right-3 bg-red-500/80 hover:bg-red-600 backdrop-blur-sm border border-red-400/50 shadow-xl transition-all duration-300 hover:scale-110"
                         onClick={clearImage}
                       >
-                        <IconX size={18} />
+                        <IconX size={20} />
                       </ActionIcon>
                     </div>
                   </Card.Section>
 
                   {imageFile && (
-                    <div className="mt-4">
+                    <div className="mt-4 relative z-10">
                       <Badge
                         variant="light"
-                        color="gray"
                         size="lg"
-                        className="bg-neutral-800 text-neutral-200"
+                        className="bg-gradient-to-r from-slate-800/80 to-slate-700/80 text-slate-200 border border-slate-600/50 px-4 py-2"
                       >
-                        {imageFile.name} (
-                        {(imageFile.size / 1024 / 1024).toFixed(2)} MB)
+                        <span className="font-medium">{imageFile.name}</span>
+                        <span className="ml-2 text-slate-400">
+                          ({(imageFile.size / 1024 / 1024).toFixed(2)} MB)
+                        </span>
                       </Badge>
                     </div>
                   )}
@@ -640,66 +680,71 @@ const Home = () => {
               {/* Control Panel */}
               <Card
                 shadow="none"
-                padding="lg"
+                padding="xl"
                 radius="xl"
-                className="border border-neutral-800 bg-neutral-900"
+                className="border border-slate-700/50 bg-gradient-to-br from-slate-900/80 to-slate-800/60 backdrop-blur-xl hover-lift transition-all duration-500 overflow-hidden"
               >
-                <Stack gap="lg">
+                <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 via-purple-500/5 to-pink-500/5" />
+                
+                <Stack gap="xl" className="relative z-10">
                   <Button
                     onClick={handleExtract}
                     disabled={!imageData || !workerReady || isProcessing}
                     size="xl"
-                    className="bg-white text-black hover:bg-neutral-200"
+                    className="bg-gradient-to-r from-emerald-500 to-blue-600 hover:from-emerald-600 hover:to-blue-700 text-white shadow-2xl transition-all duration-300 hover:shadow-emerald-500/25 hover-lift py-4 text-lg font-bold"
                     loading={isProcessing}
-                    leftSection={<IconPhoto size={24} />}
+                    leftSection={<IconPhoto size={28} />}
                   >
-                    {isProcessing ? "Processing..." : "Extract Text"}
+                    {isProcessing ? "✨ Processing Magic..." : "🚀 Extract Text"}
                   </Button>
 
                   {ocrResult && !isAnimating && (
                     <Button
                       onClick={() => generateQuiz(ocrResult)}
                       size="xl"
-                      className="bg-blue-600 hover:bg-blue-700"
-                      leftSection={<IconFileText size={24} />}
+                      className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white shadow-2xl transition-all duration-300 hover:shadow-purple-500/25 hover-lift py-4 text-lg font-bold"
+                      leftSection={<IconFileText size={28} />}
                     >
-                      Open Quiz
+                      🎯 Generate Quiz
                     </Button>
                   )}
 
                   {/* Status */}
                   <div className="flex items-center justify-between">
-                    <Text size="sm" className="font-medium text-neutral-400">
+                    <Text size="md" className="font-semibold text-slate-300">
                       {progressLabel}
                     </Text>
                     {workerReady && (
                       <Badge
-                        color="green"
+                        size="lg"
                         variant="light"
-                        className="bg-green-900/30 text-green-400"
+                        className="bg-gradient-to-r from-emerald-900/40 to-green-800/40 text-emerald-300 border border-emerald-500/30 px-4 py-2"
                       >
-                        Ready
+                        ✅ Ready
                       </Badge>
                     )}
                   </div>
 
                   {/* Progress Bar */}
                   {(progress > 0 || isProcessing) && (
-                    <div className="space-y-3">
-                      <Progress
-                        value={progress * 100}
-                        size="lg"
-                        radius="xl"
-                        className="transition-all duration-300"
-                        color="gray"
-                        striped={isProcessing}
-                        animated={isProcessing}
-                      />
+                    <div className="space-y-4">
+                      <div className="relative">
+                        <Progress
+                          value={progress * 100}
+                          size="xl"
+                          radius="xl"
+                          className="transition-all duration-500"
+                          color="blue"
+                          striped={isProcessing}
+                          animated={isProcessing}
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-xl opacity-50" />
+                      </div>
                       <Text
-                        size="xs"
-                        className="text-right text-neutral-500 font-medium"
+                        size="sm"
+                        className="text-right text-slate-400 font-semibold"
                       >
-                        {Math.round(progress * 100)}% complete
+                        ⚡ {Math.round(progress * 100)}% complete
                       </Text>
                     </div>
                   )}
@@ -710,91 +755,88 @@ const Home = () => {
               {ocrResult && (
                 <Card
                   shadow="none"
-                  padding="lg"
+                  padding="xl"
                   radius="xl"
-                  className="flex-1 border border-neutral-800 bg-neutral-900"
+                  className="flex-1 border border-slate-700/50 bg-gradient-to-br from-slate-900/80 to-slate-800/60 backdrop-blur-xl hover-lift transition-all duration-500 overflow-hidden"
                 >
-                  <Stack gap="lg">
+                  <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/5 via-blue-500/5 to-purple-500/5" />
+                  
+                  <Stack gap="lg" className="relative z-10">
                     <Group justify="between" align="center">
-                      <Text size="xl" className="font-bold text-white">
-                        Extracted Text
+                      <Text size="xl" className="font-bold bg-gradient-to-r from-emerald-400 to-blue-400 bg-clip-text text-transparent">
+                        📄 Extracted Text
                         {isAnimating && (
-                          <span className="ml-2 text-neutral-400">⚡</span>
+                          <span className="ml-3 text-yellow-400 animate-pulse">⚡</span>
                         )}
                       </Text>
                       <Group gap="xs">
                         <ActionIcon
                           variant="light"
-                          color="gray"
                           onClick={handleCopyText}
-                          size="lg"
+                          size="xl"
                           title="Copy to clipboard"
-                          className="hover:bg-neutral-800"
+                          className="bg-slate-800/50 hover:bg-blue-600/20 border border-slate-600/50 hover:border-blue-500/50 text-slate-300 hover:text-blue-300 transition-all duration-300 hover-lift"
                         >
-                          <IconCopy size={18} />
+                          <IconCopy size={20} />
                         </ActionIcon>
                         <ActionIcon
                           variant="light"
-                          color="gray"
                           onClick={handleDownloadText}
-                          size="lg"
+                          size="xl"
                           title="Download as text file"
-                          className="hover:bg-neutral-800"
+                          className="bg-slate-800/50 hover:bg-emerald-600/20 border border-slate-600/50 hover:border-emerald-500/50 text-slate-300 hover:text-emerald-300 transition-all duration-300 hover-lift"
                         >
-                          <IconFileText size={18} />
+                          <IconFileText size={20} />
                         </ActionIcon>
                         <ActionIcon
                           variant="light"
-                          color="gray"
                           onClick={handleDownloadPDF}
-                          size="lg"
+                          size="xl"
                           title="Download as PDF"
-                          className="hover:bg-neutral-800"
+                          className="bg-slate-800/50 hover:bg-purple-600/20 border border-slate-600/50 hover:border-purple-500/50 text-slate-300 hover:text-purple-300 transition-all duration-300 hover-lift"
                         >
-                          <IconFile size={18} />
+                          <IconFile size={20} />
                         </ActionIcon>
                         <ActionIcon
                           variant="light"
-                          color="gray"
                           onClick={handleDownloadMarkdown}
-                          size="lg"
+                          size="xl"
                           title="Download as Markdown"
-                          className="hover:bg-neutral-800"
+                          className="bg-slate-800/50 hover:bg-pink-600/20 border border-slate-600/50 hover:border-pink-500/50 text-slate-300 hover:text-pink-300 transition-all duration-300 hover-lift"
                         >
-                          <IconMarkdown size={18} />
+                          <IconMarkdown size={20} />
                         </ActionIcon>
                       </Group>
                     </Group>
 
-                    <Card className="bg-black border-0 max-h-96 overflow-hidden rounded-xl">
-                      <div className="max-h-80 overflow-y-auto p-4">
+                    <Card className="bg-gradient-to-br from-slate-950/80 to-slate-900/80 border border-slate-700/50 max-h-96 overflow-hidden rounded-xl backdrop-blur-sm">
+                      <div className="max-h-80 overflow-y-auto p-6">
                         <Text
-                          className="text-neutral-100 font-mono text-sm whitespace-pre-wrap break-words leading-relaxed"
-                          style={{ fontFamily: "Monaco, Consolas, monospace" }}
+                          className="text-slate-100 font-mono text-sm whitespace-pre-wrap break-words leading-relaxed selection:bg-blue-500/30"
+                          style={{ fontFamily: "JetBrains Mono, Monaco, Consolas, monospace" }}
                         >
                           {displayedText}
                           {isAnimating && (
-                            <span className="typewriter-cursor text-neutral-500">
-                              |
-                            </span>
+                            <span className="typewriter-cursor text-blue-400 animate-pulse">|</span>
                           )}
                         </Text>
                       </div>
                     </Card>
 
-                    <Text size="xs" className="text-neutral-500 font-medium">
-                      {displayedText.length} characters •{" "}
-                      {displayedText.split("\n").length} lines
+                    <div className="flex items-center justify-between">
+                      <Text size="sm" className="text-slate-400 font-medium">
+                        📊 {displayedText.length} characters • {displayedText.split("\n").length} lines
+                      </Text>
                       {isAnimating && (
-                        <span className="ml-2 text-neutral-400">
-                          (Typing...{" "}
-                          {Math.round(
-                            (displayedText.length / ocrResult.length) * 100
-                          )}
-                          %)
-                        </span>
+                        <Badge
+                          size="md"
+                          variant="light"
+                          className="bg-gradient-to-r from-yellow-900/40 to-orange-800/40 text-yellow-300 border border-yellow-500/30 animate-pulse"
+                        >
+                          ⌨️ Typing... {Math.round((displayedText.length / ocrResult.length) * 100)}%
+                        </Badge>
                       )}
-                    </Text>
+                    </div>
                   </Stack>
                 </Card>
               )}
@@ -918,7 +960,6 @@ const Home = () => {
           </Group>
         </Container>
       </div>
-    </MantineProvider>
   );
 };
 

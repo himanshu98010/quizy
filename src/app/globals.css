@@ -1,136 +1,33 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
-/* Custom scrollbar */
-::-webkit-scrollbar {
-  width: 8px;
+:root {
+  --grid-color: 255 255 255 / 0.06;
 }
 
-::-webkit-scrollbar-track {
-  background: rgba(71, 85, 105, 0.1);
-  border-radius: 4px;
+body {
+  background-color: #050509;
+  color: #e7e7ea;
 }
 
-::-webkit-scrollbar-thumb {
-  background: rgba(100, 116, 139, 0.5);
-  border-radius: 4px;
+.stars {
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(1px 1px at 10% 20%, rgba(255,255,255,0.5) 50%, transparent 51%),
+    radial-gradient(1px 1px at 30% 80%, rgba(255,255,255,0.35) 50%, transparent 51%),
+    radial-gradient(1px 1px at 70% 30%, rgba(255,255,255,0.4) 50%, transparent 51%),
+    radial-gradient(1px 1px at 90% 60%, rgba(255,255,255,0.3) 50%, transparent 51%);
+  pointer-events: none;
 }
 
-::-webkit-scrollbar-thumb:hover {
-  background: rgba(100, 116, 139, 0.7);
+.grid-overlay {
+  position: absolute;
+  inset: -100% -100%;
+  background-image: linear-gradient(to right, rgba(var(--grid-color)) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(var(--grid-color)) 1px, transparent 1px);
+  background-size: 48px 48px;
+  mask-image: radial-gradient(ellipse at center, black 30%, transparent 70%);
+  opacity: 0.35;
+  pointer-events: none;
 }
 
-/* Typewriter cursor animation */
-@keyframes blink {
-  0%, 50% {
-    opacity: 1;
-  }
-  51%, 100% {
-    opacity: 0;
-  }
-}
 
-.typewriter-cursor {
-  animation: blink 1s infinite;
-}
-
-/* Pulse animation for processing indicators */
-@keyframes pulse-slow {
-  0%, 100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.6;
-  }
-}
-
-.pulse-slow {
-  animation: pulse-slow 2s infinite;
-}
-
-/* Enhanced hover transitions */
-.hover-lift {
-  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  transform-origin: center center;
-}
-
-.hover-lift:hover {
-  transform: translateY(-4px) scale(1.02);
-  box-shadow: 
-    0 20px 40px -12px rgba(59, 130, 246, 0.15),
-    0 10px 20px -6px rgba(147, 51, 234, 0.1),
-    0 0 0 1px rgba(255, 255, 255, 0.05);
-}
-
-/* Gradient animations */
-@keyframes gradient-shift {
-  0% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-  100% {
-    background-position: 0% 50%;
-  }
-}
-
-.animate-gradient {
-  background-size: 200% 200%;
-  animation: gradient-shift 6s ease infinite;
-}
-
-/* Floating animation */
-@keyframes float {
-  0%, 100% {
-    transform: translateY(0px);
-  }
-  50% {
-    transform: translateY(-10px);
-  }
-}
-
-.animate-float {
-  animation: float 3s ease-in-out infinite;
-}
-
-/* Glow effect */
-.glow {
-  filter: drop-shadow(0 0 10px rgba(59, 130, 246, 0.3));
-}
-
-/* Selection styling */
-::selection {
-  background-color: rgba(59, 130, 246, 0.3);
-  color: white;
-}
-
-/* Focus styles */
-.focus-ring:focus {
-  outline: 2px solid rgba(59, 130, 246, 0.5);
-  outline-offset: 2px;
-}
-
-/* Glass morphism utility */
-.glass {
-  background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-/* Shimmer loading effect */
-@keyframes shimmer {
-  0% {
-    background-position: -200px 0;
-  }
-  100% {
-    background-position: calc(200px + 100%) 0;
-  }
-}
-
-.shimmer {
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
-  background-size: 200px 100%;
-  animation: shimmer 1.5s infinite;
-}

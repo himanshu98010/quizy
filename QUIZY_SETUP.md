@@ -18,3 +18,4 @@ create file '.env.local'
 NEXT_PUBLIC_GEMINI_API_KEY=your-gemini-api-key
 
 npm run dev
+

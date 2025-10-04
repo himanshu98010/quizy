@@ -56,7 +56,7 @@ IMPORTANT: Respond with ONLY valid JSON in this exact format (no additional text
 }
 
 Requirements:
-- Generate exactly 5 questions based on the text content
+- Generate few (3 to 8 based on the text content) questions based on the text content
 - Make questions clear and test understanding
 - Ensure options are plausible and varied
 - Correct answers should be distributed (0, 1, 2, 3)

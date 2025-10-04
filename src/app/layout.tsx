@@ -14,10 +14,10 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <LenisProvider>
           <nav className="fixed inset-x-0 top-0 z-50 mx-auto w-full max-w-6xl px-4 py-4 backdrop-blur supports-[backdrop-filter]:bg-black/30">
             <div className="flex items-center justify-between">
-              <a href="/" className="font-semibold tracking-tight">
-                Quizy
+              <a href="/" className="font-semibold tracking-tight text-xl">
+                Instant Question Paper Generator
               </a>
-              <div className="flex items-center gap-4 text-sm">
+              <div className="flex items-center gap-4 py-[8px] text-sm">
                 <a href="/" className="opacity-80 hover:opacity-100">
                   Home
                 </a>

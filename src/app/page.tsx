@@ -6,7 +6,7 @@ export default function HomePage() {
     <div className="relative isolate overflow-hidden">
       <div className="stars" />
       <div className="grid-overlay" />
-      <section className="mx-auto flex min-h-[70dvh] w-full max-w-5xl flex-col items-center justify-center gap-6 px-6 text-center">
+      <section className="mx-auto flex min-h-[60dvh] w-full max-w-5xl flex-col items-center justify-center gap-6 px-6 text-center">
         <motion.p
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 0.8, y: 0 }}
@@ -19,7 +19,7 @@ export default function HomePage() {
           transition={{ delay: 0.2 }}
           className="text-5xl font-semibold leading-tight md:text-7xl"
         >
-          Quizy. Expanding how you study with AI.
+          Expanding how you study with AI.
         </motion.h1>
         <motion.p
           initial={{ opacity: 0, y: 10 }}
@@ -52,7 +52,7 @@ export default function HomePage() {
         </motion.div>
       </section>
 
-      <section id="how" className="mx-auto max-w-5xl px-6 py-24">
+      <section id="how" className="mx-auto max-w-5xl px-6 pb-10">
         <div className="grid gap-6 md:grid-cols-3">
           {[
             {

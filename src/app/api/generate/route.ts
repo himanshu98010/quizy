@@ -29,11 +29,12 @@ export async function POST(request: Request) {
       preferred && preferred.trim()
         ? [preferred.trim()]
         : [
+            // Prefer stable model names known to support generateContent in v1beta
             "gemini-2.5-flash",
             "gemini-2.5-pro",
+            "gemini-1.5-flash",
+            "gemini-1.5-pro",
             "gemini-1.5-flash-8b",
-            "gemini-2.5-pro-latest",
-            "gemini-2.5-flash-latest",
           ]
     ) as string[];
 
@@ -65,12 +66,14 @@ Requirements:
 
     let lastError: any = null;
     let responseText: string | null = null;
+    let modelUsed: string | null = null;
     for (const modelName of candidates) {
       try {
         const model = genAI.getGenerativeModel({ model: modelName });
         const result = await model.generateContent(prompt);
         const response = await result.response;
         responseText = response.text().trim();
+        modelUsed = modelName;
         break;
       } catch (err: any) {
         lastError = err;
@@ -124,7 +127,7 @@ Requirements:
       questions: quizData.questions,
       totalQuestions: quizData.questions.length,
       timeLimit: 300,
-      modelUsed: candidates.find((m) => true) || "",
+      modelUsed: modelUsed || candidates[0] || "",
     });
   } catch (error: any) {
     return NextResponse.json(

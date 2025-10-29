@@ -17,11 +17,12 @@ export async function GET() {
     const genAI = new GoogleGenerativeAI(apiKey);
     const candidates = [
       process.env.GEMINI_MODEL?.trim(),
-      "gemini-1.5-pro",
+      // Prefer stable model names; avoid "-latest" variants which may 404 in v1beta
+      "gemini-2.5-flash",
+      "gemini-2.5-pro",
       "gemini-1.5-flash",
+      "gemini-1.5-pro",
       "gemini-1.5-flash-8b",
-      "gemini-1.5-pro-latest",
-      "gemini-1.5-flash-latest",
     ].filter(Boolean) as string[];
 
     const tried: { model: string; ok: boolean; error?: string }[] = [];

@@ -1,6 +1,7 @@
 "use client";
 import { ReactNode, useEffect } from "react";
 import Lenis from "lenis";
+import { MantineProvider } from "@mantine/core";
 
 export function LenisProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
@@ -19,5 +20,5 @@ export function LenisProvider({ children }: { children: ReactNode }) {
       lenis.destroy();
     };
   }, []);
-  return <>{children}</>;
+  return <MantineProvider>{children}</MantineProvider>;
 }

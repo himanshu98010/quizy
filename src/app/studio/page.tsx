@@ -52,7 +52,7 @@ export default function StudioPage() {
   const [ocrResult, setOcrResult] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
   const [workerReady, setWorkerReady] = useState(false);
-  const [cacheStatus, setCacheStatus] = useState<string>("checking");
+  const [_, setCacheStatus] = useState<string>("checking");
   const [displayedText, setDisplayedText] = useState("");
   const [isAnimating, setIsAnimating] = useState(false);
 
@@ -65,10 +65,16 @@ export default function StudioPage() {
     "upload" | "text" | "quiz" | "results"
   >("upload");
 
-  const workerRef = useRef<any>(null);
+  type TesseractWorker = {
+    recognize: (
+      image: string,
+      options?: unknown
+    ) => Promise<{ data: { text: string } }>;
+    terminate: () => void;
+  };
+  const workerRef = useRef<TesseractWorker | null>(null);
 
   const apiKey = process.env.NEXT_PUBLIC_GEMINI_API_KEY || "";
-  const genAI = new GoogleGenerativeAI(apiKey);
 
   const generateQuiz = async (text: string) => {
     if (!text.trim()) return;
@@ -101,12 +107,13 @@ export default function StudioPage() {
         message: `Generated ${data.totalQuestions} questions.`,
         color: "green",
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Error generating quiz:", error);
       setProgressLabel("Failed to generate quiz");
       notifications.show({
         title: "AI Error",
-        message: error?.message || "Unable to generate quiz.",
+        message:
+          error instanceof Error ? error.message : "Unable to generate quiz.",
         color: "red",
       });
 
@@ -236,7 +243,7 @@ export default function StudioPage() {
         );
 
         const worker = await createWorker("eng", undefined, {
-          logger: (message: any) => {
+          logger: (message: { status?: string; progress?: number }) => {
             if (message.progress !== undefined) {
               setProgress(message.progress);
               if (!isCached && message.progress > 0.5) {
@@ -366,7 +373,7 @@ export default function StudioPage() {
         message: "Text copied to clipboard",
         color: "blue",
       });
-    } catch (error) {
+    } catch (_error) {
       notifications.show({
         title: "Copy Failed",
         message: "Could not copy text to clipboard",
@@ -458,18 +465,7 @@ export default function StudioPage() {
     resetQuiz();
   };
 
-  const clearCache = () => {
-    try {
-      localStorage.removeItem("tesseract-cache-v1");
-      localStorage.removeItem("tesseract-cache-v1-timestamp");
-      setCacheStatus("not-cached");
-      notifications.show({
-        title: "Cache Cleared",
-        message: "OCR cache cleared. Refresh the page to re-download.",
-        color: "blue",
-      });
-    } catch {}
-  };
+  // clearCache utility removed (unused)
 
   return (
     <main className="min-h-[calc(100vh-72px)] bg-neutral-950">

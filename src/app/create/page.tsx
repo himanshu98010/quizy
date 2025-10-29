@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import { motion } from "framer-motion";
+import NextImage from "next/image";
 import Tesseract from "tesseract.js";
 
 export default function CreatePage() {
@@ -23,8 +24,9 @@ export default function CreatePage() {
       if (!res.ok) throw new Error(data?.error || "Failed to generate");
       localStorage.setItem("quizy:current", JSON.stringify(data));
       window.location.href = "/quiz";
-    } catch (e: any) {
-      setError(e?.message || "Unknown error");
+    } catch (e: unknown) {
+      const message = e instanceof Error ? e.message : "Unknown error";
+      setError(message);
     } finally {
       setLoading(false);
     }
@@ -50,8 +52,9 @@ export default function CreatePage() {
       } else {
         setError("Could not extract text from image");
       }
-    } catch (e: any) {
-      setError(e?.message || "OCR failed");
+    } catch (e: unknown) {
+      const message = e instanceof Error ? e.message : "OCR failed";
+      setError(message);
     }
   }
 
@@ -96,9 +99,11 @@ export default function CreatePage() {
           </label>
 
           {preview && (
-            <img
+            <NextImage
               src={preview}
               alt="preview"
+              width={600}
+              height={320}
               className="h-40 w-full rounded-lg object-cover"
             />
           )}

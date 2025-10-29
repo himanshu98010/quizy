@@ -1,5 +1,6 @@
 import "./globals.css";
 import { ReactNode } from "react";
+import Link from "next/link";
 import { LenisProvider } from "@/components/LenisProvider";
 
 export const metadata = {
@@ -14,28 +15,28 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <LenisProvider>
           <nav className="fixed inset-x-0 top-0 z-50 mx-auto w-full max-w-6xl px-4 py-4 backdrop-blur supports-[backdrop-filter]:bg-black/30">
             <div className="flex items-center justify-between">
-              <a href="/" className="font-semibold tracking-tight text-xl">
+              <Link href="/" className="font-semibold tracking-tight text-xl">
                 Instant Question Paper Generator
-              </a>
+              </Link>
               <div className="flex items-center gap-4 py-[8px] text-sm">
-                <a href="/" className="opacity-80 hover:opacity-100">
+                <Link href="/" className="opacity-80 hover:opacity-100">
                   Home
-                </a>
-                <a href="/create" className="opacity-80 hover:opacity-100">
+                </Link>
+                <Link href="/create" className="opacity-80 hover:opacity-100">
                   Create
-                </a>
-                <a href="/quiz" className="opacity-80 hover:opacity-100">
+                </Link>
+                <Link href="/quiz" className="opacity-80 hover:opacity-100">
                   Quiz
-                </a>
-                <a href="/results" className="opacity-80 hover:opacity-100">
+                </Link>
+                <Link href="/results" className="opacity-80 hover:opacity-100">
                   Results
-                </a>
-                <a
+                </Link>
+                <Link
                   href="/create"
                   className="rounded-full bg-neutral-300 px-4 py-2 text-black font-medium hover:bg-brand-700"
                 >
                   Launch
-                </a>
+                </Link>
               </div>
             </div>
           </nav>

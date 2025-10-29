@@ -30,6 +30,8 @@ export default function QuizPage() {
     );
   }, [answers, questions]);
 
+  const attempted = useMemo(() => Object.keys(answers).length, [answers]);
+
   function submit() {
     const payload = { score, total: questions.length, questions, answers };
     localStorage.setItem("quizy:results", JSON.stringify(payload));
@@ -88,7 +90,7 @@ export default function QuizPage() {
           onClick={submit}
           className="rounded-full  bg-neutral-300 px-6 py-3 text-black font-medium hover:bg-brand-700"
         >
-          Submit ({score}/{questions.length})
+          Submit ({attempted}/{questions.length})
         </button>
       </div>
     </div>

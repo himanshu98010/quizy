@@ -27,8 +27,8 @@ import "@mantine/dropzone/styles.css";
 import "@mantine/notifications/styles.css";
 
 import { createWorker } from "tesseract.js";
+import type { Worker as TesseractWorker } from "tesseract.js";
 import jsPDF from "jspdf";
-import { GoogleGenerativeAI } from "@google/generative-ai";
 
 interface Question {
   id: number;
@@ -52,7 +52,7 @@ export default function StudioPage() {
   const [ocrResult, setOcrResult] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
   const [workerReady, setWorkerReady] = useState(false);
-  const [_, setCacheStatus] = useState<string>("checking");
+  const [, setCacheStatus] = useState<string>("checking");
   const [displayedText, setDisplayedText] = useState("");
   const [isAnimating, setIsAnimating] = useState(false);
 
@@ -65,16 +65,8 @@ export default function StudioPage() {
     "upload" | "text" | "quiz" | "results"
   >("upload");
 
-  type TesseractWorker = {
-    recognize: (
-      image: string,
-      options?: unknown
-    ) => Promise<{ data: { text: string } }>;
-    terminate: () => void;
-  };
   const workerRef = useRef<TesseractWorker | null>(null);
 
-  const apiKey = process.env.NEXT_PUBLIC_GEMINI_API_KEY || "";
 
   const generateQuiz = async (text: string) => {
     if (!text.trim()) return;
@@ -267,7 +259,7 @@ export default function StudioPage() {
           message: isCached ? "Loaded from cache" : "Downloaded and cached",
           color: "green",
         });
-      } catch (error) {
+      } catch {
         setProgressLabel("Initialization failed");
         setWorkerReady(false);
         notifications.show({
@@ -351,7 +343,7 @@ export default function StudioPage() {
         message: `Text extracted! ${extractedText.length} characters.`,
         color: "green",
       });
-    } catch (error) {
+    } catch {
       setProgressLabel("Error occurred");
       setOcrResult("Error: Could not process image. Please try again.");
       notifications.show({

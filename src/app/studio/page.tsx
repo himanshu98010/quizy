@@ -365,7 +365,7 @@ export default function StudioPage() {
         message: "Text copied to clipboard",
         color: "blue",
       });
-    } catch (_error) {
+    } catch {
       notifications.show({
         title: "Copy Failed",
         message: "Could not copy text to clipboard",

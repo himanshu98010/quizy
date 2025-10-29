@@ -64,7 +64,7 @@ Requirements:
 - Provide helpful explanations
 - Return ONLY the JSON object, no other text`;
 
-    let lastError: any = null;
+    let lastError: unknown = null;
     let responseText: string | null = null;
     let modelUsed: string | null = null;
     for (const modelName of candidates) {
@@ -75,7 +75,7 @@ Requirements:
         responseText = response.text().trim();
         modelUsed = modelName;
         break;
-      } catch (err: any) {
+      } catch (err: unknown) {
         lastError = err;
       }
     }
@@ -83,7 +83,7 @@ Requirements:
       return NextResponse.json(
         {
           error:
-            lastError?.message ||
+            (lastError instanceof Error ? lastError.message : undefined) ||
             "All Gemini models failed. Check model availability/region and billing.",
         },
         { status: 502 }
@@ -101,7 +101,7 @@ Requirements:
       cleanResponse = cleanResponse.substring(0, jsonEnd + 1);
     }
 
-    let quizData: any;
+    let quizData: unknown;
     try {
       quizData = JSON.parse(cleanResponse);
     } catch {
@@ -116,22 +116,34 @@ Requirements:
       }
     }
 
-    if (!quizData?.questions || !Array.isArray(quizData.questions)) {
+    const hasQuestions =
+      typeof quizData === "object" &&
+      quizData !== null &&
+      Array.isArray((quizData as { questions?: unknown }).questions);
+    if (!hasQuestions) {
       return NextResponse.json(
         { error: "AI returned unexpected format" },
         { status: 502 }
       );
     }
 
+    const questions = (quizData as { questions: unknown[] }).questions as {
+      id: number;
+      question: string;
+      options: string[];
+      correctAnswer: number;
+      explanation?: string;
+    }[];
     return NextResponse.json({
-      questions: quizData.questions,
-      totalQuestions: quizData.questions.length,
+      questions,
+      totalQuestions: questions.length,
       timeLimit: 300,
       modelUsed: modelUsed || candidates[0] || "",
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : "Internal server error";
     return NextResponse.json(
-      { error: error?.message || "Internal server error" },
+      { error: message },
       { status: 500 }
     );
   }

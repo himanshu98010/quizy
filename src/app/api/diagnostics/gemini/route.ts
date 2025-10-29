@@ -31,12 +31,14 @@ export async function GET() {
       try {
         const model = genAI.getGenerativeModel({ model: modelName });
         const result = await model.generateContent("ping");
-        const text = result.response.text();
+        // Read response once to confirm the model works
+        void result.response.text();
         tried.push({ model: modelName, ok: true });
         workingModel = modelName;
         break;
-      } catch (e: any) {
-        tried.push({ model: modelName, ok: false, error: e?.message });
+      } catch (e: unknown) {
+        const message = e instanceof Error ? e.message : "Unknown error";
+        tried.push({ model: modelName, ok: false, error: message });
       }
     }
 
@@ -48,9 +50,10 @@ export async function GET() {
     }
 
     return NextResponse.json({ ok: true, workingModel, tried });
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : "Unknown error";
     return NextResponse.json(
-      { ok: false, error: error?.message || "Unknown error" },
+      { ok: false, error: message },
       { status: 500 }
     );
   }
